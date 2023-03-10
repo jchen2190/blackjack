@@ -1,175 +1,98 @@
 body {
+    background-color: #000;
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 1.25rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
     background-image: url('images/blackjack-table.jpg');
-    background-repeat: no-repeat;
     background-size: contain;
+    background-repeat: no-repeat;
+    height:100vh;
 }
 
+/* app div holds player and dealer card boxes */
 .container {
     width: 100%;
-    height: 85vh;
-    background-color: transparent;
-    border: none;
+    margin: 0 auto;
+    padding-top: 90px;
+    color: #FFF;
+
+}
+
+/* the header holds 3 buttons and 4 divs */
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 150px;
+    margin: 0 auto;
+    border-top-left-radius: 35px;
+    border-top-right-radius: 35px;
+    background-color: #534545;
+    border-bottom: 5px solid #5E651F;
+}
+
+/* the DEAL, HIT and STAND buttons */
+button {
+    width: 100px;
+    cursor: pointer;
+    margin: 10px;
+    color: #977;
+    font-weight: bold;
+    font-size: 1.25rem;
+    border-radius: 5px;
+    padding: 7px; 17px;
+}
+
+#goBack {
+	position: absolute;
+	bottom: 100px;
+	left: 100px;
+	font-size: 1.5rem;
+	padding: 5px;
+	width: 200px;
+	height: 50px;
+	color: white;
+	background-color: darkblue;
+	border-radius: 7px;
+	margin: 5px 15px;
+	cursor: pointer;
+}
+
+/* 4 divs in the header come after the buttons: messageBox, playerScoreBox, dealerScoreBox and moneyBox */
+header div {
+    margin: 0 10px;
+    width: 150px;
+    height: 30px;
+    background-color: white;
+    color: #265F12;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    border: 3px solid yellowgreen;
+}
+
+/* boxes to hold the cards for player and dealer -- each it its own box */
+#app div {
+    width: 1000px;
+    height: 160px;
+    margin: 0px auto 40px auto;
+    text-align: center;
+    padding: 5px 30px;
+    border: 0px solid red;
 }
 
 img {
-    width: 120px;
+    width: 115px;
     height: auto;
-    margin: 10px;
+    margin: 15px;
+    display: inline-block;
     transform: perspective(80px) rotateX(10deg);   
 }
 
-/* make the dealer cards slightly smaller to make them appear farther away */
-#dealer-cards-div img {
-    width: 105px;
-    height: "auto";
-    margin-bottom: 0px;
-}
 
-#player-cards-div {
-    margin-bottom: 80px;
-    /* background-color: #00ffff50; */
-    /* border: 7px dashed yellow; */
-    padding: 0;
-}
-
-#split-cards-box {
-    margin-bottom: 80px;
-    position: absolute;
-    bottom: 200px;
-    /* border: 7px dashed orange; */
-    z-index: 3;
-    left: 350px;
-    padding: 0;
-}
-
-button {
-    width: 100px;
-    font-size: 1.25rem;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 10px;
-    background-color: #464;
-    color: white;
-    cursor: pointer;
-    margin: 1rem 0 0 1rem;
-}
-
-button:hover {
-    background-color: #494;
-}
-
-.disabled-btn {
-    background-color: #464;
-    opacity: 0.7;
-    cursor: default;
-}
-
-.enabled-btn {
-    background-color: #494;
-    opacity: 1;
-    cursor: pointer;
-}
-
-.disabled-btn:hover {
-    background-color: #464;
-}
-
-div {
-    padding: 1.5rem;
-    min-width: 50%;
-    height: 225px;
-    /* margin: 1rem; */
-    border-radius: 1.5rem;
-}
-
-div image {
-    height: 90%; 
-}
-
-span {
-    color: white;
-    width: 300px;
-    padding: 0.65rem;
-    font-family: sans-serif;
-    margin: 0 1rem;
-    border-radius: 1rem;
-    font-size: 1.3rem;
-    font-weight: bold;
-}
-
-h1, h2 {
-    position: absolute;
-    z-index: 1;
-    left: 30px;
-    bottom: 147px;
-    color: #fff;
-    display: inline-block;
-    font-size: 24px;
-}
-
-h2 {
-    left: 35%;
-    text-align: center;
-}
-
-input, select {
-    width: 100px; 
-    padding: 3px 6px; 
-    font-size: 21px; 
-    font-weight: bold; 
-    color: #555; 
-    border-radius: 4px; 
-    text-align: center;
-    margin: 0;
-    /* vertical-align: baseline; */
-}
-
-#chips-bet-box, #chips-won-box, #chips-split-box {
-    border: 4px dashed orange; /* test for chips section */
-    position: absolute;
-    left: 100px;
-    bottom: 350px;
-    /* background-color: aqua; */
-    /* border: 1px solid #00FFFF50; */
-    min-width: 0%;
-    width: 500px;
-    height: 100px;
-    z-index: 1;
-    border-radius: 58px;
-    padding: 0px;
-    margin: 30px;
-    background-image: none;
-    /* transform: perspective(120px) rotateX(20deg); */
-    transform: rotate(20deg);
-    /* background-image: url(../images/chips/chip-25.png);  */
-    /* background-size: cover; */
-}
-
-#chips-won-box {
-    left: 105px;
-    bottom: 385px;
-    /* background-color: yellow; */
-    /* border: 1px solid #FFFF0050; */
-}
-
-#chips-split-box {
-    left: 105px;
-    bottom: 385px;
-    /* background-color: yellow; */
-    /* border: 5px dashed #FFFF0050; */
-}
-
-#bet-txt {
-    color: #fff; 
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.chipper {
-    position: absolute;
-    width: 115px;
-    height: 115px;
-    left: 0px;
-    bottom: 0px;
-    z-index: 0;
-}
