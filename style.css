@@ -49,6 +49,26 @@ button {
     padding: 7px; 17px;
 }
 
+button:hover {
+    background-color: #494;
+}
+
+.disabled-btn {
+    background-color: #464;
+    opacity: 0.7;
+    cursor: default;
+}
+
+.enabled-btn {
+    background-color: #494;
+    opacity: 1;
+    cursor: pointer;
+}
+
+.disabled-btn:hover {
+    background-color: #464;
+}
+
 #goBack {
 	position: absolute;
 	bottom: 100px;

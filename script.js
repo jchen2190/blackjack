@@ -68,6 +68,8 @@ let holeCard;
 
 function deal() {
     // reset
+    dealBtn.disabled = true;
+    dealBtn.classList.add('disabled-btn');   
     dealCounter = 0;
     playerScore = 0;
     dealerScore = 0;
@@ -143,17 +145,19 @@ function deal() {
                 if(playerScore == 21 && dealerScore == 21) { // first check if BOTH have BLACKJACK
                     promptH2.innerHTML = "BOTH have BLACKJACK! It's a PUSH!";
                     holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
+                    declareWinner()
 
                 } else if(playerScore == 21) { // if player has blackjack (21)
                     promptH2.innerHTML = "You have BLACKJACK! You WIN!";
-                    
+                    holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
+                    declareWinner()
+
                 } else if(dealerScore == 21) { // if dealer has blackjack (21)
                     promptH2.innerHTML = "Dealer has BLACKJACK! You LOSE!";
                     holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
+                    declareWinner()
                     
-                } else { // no one has blackjack
-                    dealBtn.disabled = "true";
-                    dealBtn.classList.add('disabled-btn');                    
+                } else { // no one has blackjack                 
                     hitBtn.classList.remove('disabled-btn');
                     standBtn.classList.remove('disabled-btn');
                     hitBtn.disabled = false;
@@ -169,6 +173,9 @@ function deal() {
 }
 
 function hit() {
+    hitBtn.disabled = true; // prevent multiple clicking at once if already busted
+    hitBtn.classList.add('disabled-btn');
+
     const card = shoe.pop();
     const pic = new Image();
     pic.src = `images/cards/${card.file}`;
@@ -182,6 +189,8 @@ function hit() {
             playerScore++;
             playerAceScore++;
         }
+        hitBtn.disabled = false;
+        hitBtn.classList.remove('disabled-btn');
     } else {
         playerScore += card.valu;
         playerScoreDiv.innerHTML = "Player Score: " + playerScore;
@@ -190,26 +199,36 @@ function hit() {
             if (playerAceScore >= 11) { // if player has Ace, reduce score to prevent bust
                 playerAceScore -= 10;
                 playerScore -= 10;
+                hitBtn.disabled = false;
+                hitBtn.classList.remove('disabled-btn');
             } else {
                 promptH2.textContent = "BUSTED! You LOSE!";
+                standBtn.disabled = true;
+                standBtn.classList.add('disabled-btn');
+                declareWinner()
             }
         } else if (playerScore == 21) { // exactly 21, go to dealer
             promptH2.textContent = "You have 21! Dealer's turn!";
             stand();
         } else {
             promptH2.textContent = "Hit or Stand..?";
+            hitBtn.disabled = false;
+            hitBtn.classList.remove('disabled-btn');
         }
     }
     playerScoreDiv.innerHTML = "Player Score:" + playerScore; // update score
 }
 
 function stand() {
-    setTimeout(() => { // Dealer reveal card
+    // disable buttons when player stands
+    hitBtn.classList.add('disabled-btn');
+    standBtn.classList.add('disabled-btn');
+    hitBtn.disabled = true;
+    standBtn.disabled = true;
+
+    setTimeout(() => { // Dealer reveal card + show score
         holeCard = document.getElementById("dealer-cards-div").children[0];
         holeCard.src = `images/cards/${dealerHand[0].file}`;
-    }, 1000)
-    
-    setTimeout(() => { // prompts dealer score
         promptH2.innerHTML = "Dealer has " + dealerScore;
         dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
     }, 1000)
@@ -229,10 +248,10 @@ function stand() {
                 declareWinner();
             }
         } else {
-            promptH2.innerHTML = "Dealer stands on " + dealerScore;
+            // promptH2.innerHTML = "Dealer stands on " + dealerScore;
             declareWinner();
         }
-    }, 2000)
+    }, 1500)
 }
 
 function hitDealer() {
@@ -251,12 +270,23 @@ function hitDealer() {
                 dealerAceScore = 11; // ace counts 11
             }
             dealerScore += card.valu;
-            promptH2.innerHTML = "Dealer Score:" + dealerScore;
-            dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
-            hitDealer();
-        } else {
+
+            if (dealerScore < 17 || (dealerScore == 17 && dealerAceScore >= 11)) { // pull card again
+                // promptH2.innerHTML = "Dealer has" + dealerScore;
+                // dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+                hitDealer();
+            } else {
+                stand();
+            }
+        } else { // if dealer has previous Ace is hand
+            if(dealerAceScore > 10) {
+                dealerAceScore -= 10;
+                dealerScore -= 10;
+                dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+                stand();
+            }
             dealerScore += card.valu;
-            promptH2.innerHTML = "Dealer Score:" + dealerScore;
+            promptH2.innerHTML = "Dealer has " + dealerScore;
             dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
             if (dealerScore > 17) {
                 stand();
@@ -268,7 +298,9 @@ function hitDealer() {
 
 function declareWinner() {
     setTimeout(() => {
-        if(dealerScore > 21) {
+        if(playerScore > 21) {
+            promptH2.innerHTML = "You lose!";
+        } else if(dealerScore > 21) {
             promptH2.innerHTML = "You win! Congrats!"
         } else if(playerScore > dealerScore) {
             promptH2.innerHTML = "You win! Congrats!";
@@ -277,5 +309,10 @@ function declareWinner() {
         } else {
             promptH2.innerHTML = "It's a Push!";
         }
-    }, 1500)
+        holeCard.src = `images/cards/${dealerHand[0].file}`;
+        dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+        dealBtn.disabled = false;
+        dealBtn.classList.remove('disabled-btn');
+    }, 1000)
+       
 }
