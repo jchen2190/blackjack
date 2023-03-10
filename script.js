@@ -2,6 +2,7 @@ const kinds = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace'];
 const suits = ['Diamonds', 'Hearts', 'Spades', 'Clubs'];
 const deck = [];
 
+// make cards in a deck
 kinds.forEach(kind => {
     suits.forEach(suit => {
         // let kind = kinds[k];
@@ -21,7 +22,6 @@ kinds.forEach(kind => {
         deck.push(card);
     });
 });
-
 
 // Shoe consisting of 6 decks of cards
 const shoe = [...deck, ...deck, ...deck, ...deck, ...deck, ...deck];
@@ -55,7 +55,6 @@ const playerCardsDiv = document.getElementById('player-cards-div');
 const dealerCardsDiv = document.getElementById('dealer-cards-div');
 const playerScoreDiv = document.getElementById('player-score-div');
 const dealerScoreDiv = document.getElementById('dealer-score-div');
-
 
 let dealCounter = 0;
 let playerHand = []; // hold cards
@@ -166,7 +165,7 @@ function deal() {
 
         } // dealCounter == 4
 
-    }, 500); // deal interval
+    }, 800); // deal interval
 }
 
 function hit() {
@@ -185,6 +184,7 @@ function hit() {
         }
     } else {
         playerScore += card.valu;
+        playerScoreDiv.innerHTML = "Player Score: " + playerScore;
 
         if(playerScore > 21) {
             if (playerAceScore >= 11) { // if player has Ace, reduce score to prevent bust
@@ -200,14 +200,82 @@ function hit() {
             promptH2.textContent = "Hit or Stand..?";
         }
     }
-    playerScoreDiv.textContent = "Player Score:" + playerScore; // update score
+    playerScoreDiv.innerHTML = "Player Score:" + playerScore; // update score
 }
 
-
 function stand() {
-    // Reveal the hole card
-    setTimeout(() => {
+    setTimeout(() => { // Dealer reveal card
         holeCard = document.getElementById("dealer-cards-div").children[0];
         holeCard.src = `images/cards/${dealerHand[0].file}`;
-    }, 500)
+    }, 1000)
+    
+    setTimeout(() => { // prompts dealer score
+        promptH2.innerHTML = "Dealer has " + dealerScore;
+        dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+    }, 1000)
+
+    setTimeout(() => { // if dealer hits or not
+        if(dealerScore < 17) {
+            promptH2.innerHTML = "Dealer must hit on " + dealerScore;
+            hitDealer();
+        } else if (dealerScore ==  17) { // dealer hit on Soft 17
+            if(dealerAceScore >= 11) {
+                dealerAceScore -= 10;
+                dealerScore -= 10;
+                promptH2.innerHTML = "Dealer must hit on Soft 17";
+                hitDealer();
+            } else {
+                promptH2.innerHTML = "Dealer stands on Hard " + dealerScore;
+                declareWinner();
+            }
+        } else {
+            promptH2.innerHTML = "Dealer stands on " + dealerScore;
+            declareWinner();
+        }
+    }, 2000)
+}
+
+function hitDealer() {
+    setTimeout(() => {
+        let card = shoe.pop();
+        let pic = new Image();
+        pic.src = `images/cards/${card.file}`
+        dealerCardsDiv.appendChild(pic);
+        dealerHand.push(card);
+        
+        if(card.kind == "Ace") {
+            if(dealerAceScore == 11) {  // if dealer already has an Ace
+                dealerAceScore = 12;
+                card.valu = 1; // additional Ace counts as 1 = 12
+            } else {
+                dealerAceScore = 11; // ace counts 11
+            }
+            dealerScore += card.valu;
+            promptH2.innerHTML = "Dealer Score:" + dealerScore;
+            dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+            hitDealer();
+        } else {
+            dealerScore += card.valu;
+            promptH2.innerHTML = "Dealer Score:" + dealerScore;
+            dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+            if (dealerScore > 17) {
+                stand();
+            }
+        }
+        stand();
+    }, 2000)
+}
+
+function declareWinner() {
+    setTimeout(() => {
+        if(dealerScore > 21) {
+            promptH2.innerHTML = "You win! Congrats!"
+        } else if(playerScore > dealerScore) {
+            promptH2.innerHTML = "You win! Congrats!";
+        } else if (playerScore < dealerScore) {
+            promptH2.innerHTML = "Sorry! You lose!";
+        } else {
+            promptH2.innerHTML = "It's a Push!";
+        }
+    }, 1500)
 }
