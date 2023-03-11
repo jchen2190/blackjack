@@ -65,6 +65,29 @@ let dealerScore = 0;
 let playerAceScore = 0;
 let dealerAceScore = 0;
 let holeCard;
+let chipsBet = 0;
+
+// chips + bet
+const betMenu = document.getElementById('bet-menu');
+betMenu.addEventListener("change", bet);
+const chipsBetDiv = document.getElementById('chips-bet-div');
+const chipsWonDiv = document.getElementById('chips-won-div');
+const chipsDisplay = document.getElementById('chips-display');
+let chips = 1000;
+chipsDisplay.innerHTML = "Chips: $" + chips;
+
+
+function bet() {
+    chips += chipsBet;
+    chipsDisplay.innerHTML = "Chips: $" + chips;
+    
+    chipsBet = Number(betMenu.value);
+    // get data to display each chip
+    let indx = betMenu.selectedIndex;
+    let optn = betMenu.options[indx];
+    let chipsData = optn.dataset.chips; // "100&50" ($150);
+
+}
 
 function deal() {
     // reset
@@ -135,7 +158,7 @@ function deal() {
         }
 
         if(dealCounter == 4) { // when finish dealing
-            dealerScoreDiv.innerHTML = "Dealer Shows: " + dealerHand[1].kind;
+            dealerScoreDiv.innerHTML = "Dealer Shows: " + dealerHand[1].valu;
             playerScoreDiv.innerHTML = "Player Score: " + playerScore;
 
             // save the first dealer card -- the hidden "hole card" to a variable
@@ -185,6 +208,7 @@ function hit() {
     const pic = new Image();
     pic.src = `images/cards/${card.file}`;
     playerCardsDiv.appendChild(pic);
+    playerHand.push(card);
 
     if(card.kind == "Ace") {
         if(playerScore < 11) { // if cards less than 11, add "Ace" value
@@ -222,8 +246,8 @@ function hit() {
                 }, 700)                
             }
         } else if (playerScore == 21) { // exactly 21, go to dealer
-            // promptH2.textContent = "You have 21! Dealer's turn!";
             setTimeout(() => {
+                // promptH2.textContent = "You have 21! Dealer's turn!";
                 stand();
             }, 700)
             
@@ -234,7 +258,7 @@ function hit() {
             hitBtn.classList.add('enabled-btn');
         }
     }
-    playerScoreDiv.innerHTML = "Player Score:" + playerScore; // update score
+    playerScoreDiv.innerHTML = "Player Score: " + playerScore; // update score
 }
 
 function stand() {
@@ -250,7 +274,7 @@ function stand() {
         holeCard = document.getElementById("dealer-cards-div").children[0];
         holeCard.src = `images/cards/${dealerHand[0].file}`;
         promptH2.innerHTML = "Dealer has " + dealerScore;
-        dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+        dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
     }, 1200)
 
     setTimeout(() => { // if dealer hits or not
@@ -295,7 +319,7 @@ function hitDealer() {
             if(dealerScore > 21 && dealerAceScore > 10) { // if dealer has Ace that will bust him
                 dealerAceScore -= 10;
                 dealerScore -= 10;
-                dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+                dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
             }
             stand();
             // if (dealerScore < 17 ) { // add this if dealer hits on soft 17--> || (dealerScore == 17 && dealerAceScore >= 11)
@@ -310,11 +334,11 @@ function hitDealer() {
             if(dealerScore > 21 && dealerAceScore > 10) { // if dealer has previous Ace is hand
                 dealerAceScore -= 10;
                 dealerScore -= 10;
-                dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+                dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
                 stand();
             } else {
                 promptH2.innerHTML = "Dealer has " + dealerScore;
-                dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+                dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
                 stand();
             }
         }
@@ -335,7 +359,7 @@ function declareWinner() {
             promptH2.innerHTML = "It's a Push!";
         }
         holeCard.src = `images/cards/${dealerHand[0].file}`;
-        dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+        dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
         dealBtn.disabled = false;
         dealBtn.classList.remove('disabled-btn');
         dealBtn.classList.add('enabled-btn');

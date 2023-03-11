@@ -1,4 +1,5 @@
 body {
+    box-sizing: border-box;
     background-color: #005003;
     box-shadow: inset 10px 10px 400px 5px black;
     /* background-image: url(images/suits.svg); */
@@ -21,6 +22,13 @@ body {
     height:100vh;
 }
 
+.score-mat {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 20px;
+}
+
 /* the header holds 3 buttons and 4 divs */
 /* header {
     display: flex;
@@ -34,7 +42,7 @@ body {
     background-color: #534545;
     border-bottom: 5px solid #5E651F;
 } */
-#dealer-cards-div{
+#dealer-cards-div {
     height: 100px;
     margin-bottom: 80px;
 }
