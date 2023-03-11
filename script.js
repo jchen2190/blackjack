@@ -206,6 +206,7 @@ function hit() {
                 setTimeout(() => {
                     playerAceScore -= 10;
                     playerScore -= 10;
+                    playerScoreDiv.innerHTML = "Player Score: " + playerScore;
                     hitBtn.disabled = false;
                     hitBtn.classList.remove('disabled-btn');
                     hitBtn.classList.add('enabled-btn');
@@ -254,23 +255,24 @@ function stand() {
 
     setTimeout(() => { // if dealer hits or not
         if(dealerScore < 17) {
-            promptH2.innerHTML = "Dealer must hit on " + dealerScore;
+            // promptH2.innerHTML = "Dealer must hit on " + dealerScore;
             hitDealer();
-        } else if (dealerScore ==  17) { // dealer hit on Soft 17
-            if(dealerAceScore >= 11) {
-                dealerAceScore -= 10;
-                dealerScore -= 10;
-                promptH2.innerHTML = "Dealer must hit on Soft 17";
-                hitDealer();
-            } else {
-                promptH2.innerHTML = "Dealer stands on Hard " + dealerScore;
-                declareWinner();
-            }
+        // add this for dealer to hit on Soft 17
+        // } else if (dealerScore ==  17) { 
+        //     if(dealerAceScore >= 11) {
+        //         dealerAceScore -= 10;
+        //         dealerScore -= 10;
+        //         promptH2.innerHTML = "Dealer must hit on Soft 17";
+        //         hitDealer();
+        //     } else {
+        //         promptH2.innerHTML = "Dealer stands on Hard " + dealerScore;
+        //         declareWinner();
+        //     }
         } else {
             // promptH2.innerHTML = "Dealer stands on " + dealerScore;
             declareWinner();
         }
-    }, 1200)
+    }, 1000)
 }
 
 function hitDealer() {
@@ -281,10 +283,8 @@ function hitDealer() {
         dealerCardsDiv.appendChild(pic);
         dealerHand.push(card);
         
-        if(card.kind == "Ace") {
-            if(dealerScore > 17) {
-                stand();
-            } else if(dealerAceScore >= 11) {  // if dealer already has an Ace
+        if(card.kind == "Ace") { 
+            if(dealerScore > 21 && dealerAceScore >= 11) {  // if dealer already has an Ace
                 dealerAceScore = 12;
                 card.valu = 1; // additional Ace counts as 1 = 12
             } else {
@@ -292,30 +292,33 @@ function hitDealer() {
             }
 
             dealerScore += card.valu;
-
-            if (dealerScore < 17 || (dealerScore == 17 && dealerAceScore >= 11)) { // pull card again
-                // promptH2.innerHTML = "Dealer has" + dealerScore;
-                // dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
-                hitDealer();
-            } else {
-                stand();
+            if(dealerScore > 21 && dealerAceScore > 10) { // if dealer has Ace that will bust him
+                dealerAceScore -= 10;
+                dealerScore -= 10;
+                dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
             }
-        } else { // if dealer has previous Ace is hand
-            if(dealerAceScore > 10) {
+            stand();
+            // if (dealerScore < 17 ) { // add this if dealer hits on soft 17--> || (dealerScore == 17 && dealerAceScore >= 11)
+            //     // promptH2.innerHTML = "Dealer has" + dealerScore;
+            //     // dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
+            //     hitDealer();
+            // } else {
+            //     stand();
+            // }
+        } else { // card that is not an Ace
+            dealerScore += card.valu;
+            if(dealerScore > 21 && dealerAceScore > 10) { // if dealer has previous Ace is hand
                 dealerAceScore -= 10;
                 dealerScore -= 10;
                 dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
                 stand();
-            }
-            dealerScore += card.valu;
-            promptH2.innerHTML = "Dealer has " + dealerScore;
-            dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
-            if (dealerScore > 17) {
+            } else {
+                promptH2.innerHTML = "Dealer has " + dealerScore;
+                dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
                 stand();
             }
         }
-        stand();
-    }, 2000)
+    }, 1000)
 }
 
 function declareWinner() {
