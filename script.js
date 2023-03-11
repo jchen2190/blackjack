@@ -69,6 +69,7 @@ let holeCard;
 function deal() {
     // reset
     dealBtn.disabled = true;
+    dealBtn.classList.remove('enabled-btn');
     dealBtn.classList.add('disabled-btn');   
     dealCounter = 0;
     playerScore = 0;
@@ -77,6 +78,7 @@ function deal() {
     dealerCardsDiv.innerHTML = "";
     playerScoreDiv.innerHTML = 'Player Score: 0';
     dealerScoreDiv.innerHTML = 'Dealer Score: 0';
+    promptH2.innerHTML = "";
     playerHand = [];
     dealerHand = [];
     playerAceScore = 0;
@@ -148,7 +150,7 @@ function deal() {
                     declareWinner()
 
                 } else if(playerScore == 21) { // if player has blackjack (21)
-                    promptH2.innerHTML = "You have BLACKJACK! You WIN!";
+                    promptH2.innerHTML = "BLACKJACK!";
                     holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
                     declareWinner()
 
@@ -162,6 +164,8 @@ function deal() {
                     standBtn.classList.remove('disabled-btn');
                     hitBtn.disabled = false;
                     standBtn.disabled = false;
+                    hitBtn.classList.add('enabled-btn');
+                    standBtn.classList.add('enabled-btn');
 
                     promptH2.innerHTML = "Hit or Stand..?";
                 }
@@ -175,6 +179,7 @@ function deal() {
 function hit() {
     hitBtn.disabled = true; // prevent multiple clicking at once if already busted
     hitBtn.classList.add('disabled-btn');
+    hitBtn.classList.remove('enabled-btn');
 
     const card = shoe.pop();
     const pic = new Image();
@@ -191,29 +196,41 @@ function hit() {
         }
         hitBtn.disabled = false;
         hitBtn.classList.remove('disabled-btn');
+        hitBtn.classList.add('enabled-btn');
     } else {
         playerScore += card.valu;
         playerScoreDiv.innerHTML = "Player Score: " + playerScore;
 
         if(playerScore > 21) {
             if (playerAceScore >= 11) { // if player has Ace, reduce score to prevent bust
-                playerAceScore -= 10;
-                playerScore -= 10;
-                hitBtn.disabled = false;
-                hitBtn.classList.remove('disabled-btn');
+                setTimeout(() => {
+                    playerAceScore -= 10;
+                    playerScore -= 10;
+                    hitBtn.disabled = false;
+                    hitBtn.classList.remove('disabled-btn');
+                    hitBtn.classList.add('enabled-btn');
+                }, 700)
+                
             } else {
-                promptH2.textContent = "BUSTED! You LOSE!";
-                standBtn.disabled = true;
-                standBtn.classList.add('disabled-btn');
-                declareWinner()
+                setTimeout(() => {
+                    promptH2.textContent = "BUSTED!";
+                    standBtn.disabled = true;
+                    standBtn.classList.add('disabled-btn');
+                    standBtn.classList.remove('enabled-btn');
+                    declareWinner()
+                }, 700)                
             }
         } else if (playerScore == 21) { // exactly 21, go to dealer
-            promptH2.textContent = "You have 21! Dealer's turn!";
-            stand();
+            // promptH2.textContent = "You have 21! Dealer's turn!";
+            setTimeout(() => {
+                stand();
+            }, 700)
+            
         } else {
             promptH2.textContent = "Hit or Stand..?";
             hitBtn.disabled = false;
             hitBtn.classList.remove('disabled-btn');
+            hitBtn.classList.add('enabled-btn');
         }
     }
     playerScoreDiv.innerHTML = "Player Score:" + playerScore; // update score
@@ -221,6 +238,8 @@ function hit() {
 
 function stand() {
     // disable buttons when player stands
+    hitBtn.classList.remove('enabled-btn');
+    standBtn.classList.remove('enabled-btn');
     hitBtn.classList.add('disabled-btn');
     standBtn.classList.add('disabled-btn');
     hitBtn.disabled = true;
@@ -231,7 +250,7 @@ function stand() {
         holeCard.src = `images/cards/${dealerHand[0].file}`;
         promptH2.innerHTML = "Dealer has " + dealerScore;
         dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
-    }, 1000)
+    }, 1200)
 
     setTimeout(() => { // if dealer hits or not
         if(dealerScore < 17) {
@@ -251,7 +270,7 @@ function stand() {
             // promptH2.innerHTML = "Dealer stands on " + dealerScore;
             declareWinner();
         }
-    }, 1500)
+    }, 1200)
 }
 
 function hitDealer() {
@@ -263,12 +282,15 @@ function hitDealer() {
         dealerHand.push(card);
         
         if(card.kind == "Ace") {
-            if(dealerAceScore == 11) {  // if dealer already has an Ace
+            if(dealerScore > 17) {
+                stand();
+            } else if(dealerAceScore >= 11) {  // if dealer already has an Ace
                 dealerAceScore = 12;
                 card.valu = 1; // additional Ace counts as 1 = 12
             } else {
                 dealerAceScore = 11; // ace counts 11
             }
+
             dealerScore += card.valu;
 
             if (dealerScore < 17 || (dealerScore == 17 && dealerAceScore >= 11)) { // pull card again
@@ -313,6 +335,7 @@ function declareWinner() {
         dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
         dealBtn.disabled = false;
         dealBtn.classList.remove('disabled-btn');
+        dealBtn.classList.add('enabled-btn');
     }, 1000)
        
 }
