@@ -50,7 +50,7 @@ hitBtn.addEventListener('click', hit);
 const standBtn = document.getElementById('stand-btn');
 standBtn.addEventListener('click', stand);
 
-const promptH2 = document.querySelector('h2');
+const promptH3 = document.getElementById('prompt');
 const playerCardsDiv = document.getElementById('player-cards-div');
 const dealerCardsDiv = document.getElementById('dealer-cards-div');
 const playerScoreDiv = document.getElementById('player-score-div');
@@ -79,14 +79,45 @@ chipsDisplay.innerHTML = "Chips: $" + chips;
 
 function bet() {
     chips += chipsBet;
-    chipsDisplay.innerHTML = "Chips: $" + chips;
-    
+    chipsDisplay.innerHTML = "Chips Left: $" + chips; 
+    awardChips(false); // reset chips if no award is made (changing bet)
     chipsBet = Number(betMenu.value);
-    // get data to display each chip
-    let indx = betMenu.selectedIndex;
-    let optn = betMenu.options[indx];
-    let chipsData = optn.dataset.chips; // "100&50" ($150);
+    chipsBetDiv.innerHTML = ""; // reset chip images
 
+    // get data to display each chip
+    let indx = betMenu.selectedIndex; // Bet $150 = 11 index
+    let optn = betMenu.options[indx]; // ($150)
+    let chipsData = optn.dataset.chips; // "100&50";
+    let chipsArray = chipsData.split('&'); // ["100", "50"];
+    let chipIndx = 0;
+    let leftPos = 0;
+
+    chipInterval = setInterval(() => {
+        let chip = chipsArray[chipIndx]; // 100  then  50
+        let chipImg = new Image();
+        chipImg.src = `images/chips/chip-${chip}.png`
+        chipImg.style.zIndex = chipIndx + ""; // pile chip onto another (stack);
+        chipImg.style.position = "absolute";
+        chipImg.style.left = (leftPos) + "px";
+        chipImg.style.width = "100px";
+        chipImg.style.height = "100px";
+        chipsBetDiv.appendChild(chipImg);
+        leftPos += 40; // move next chip to the right
+        chipIndx++;
+        if(chipIndx == chipsArray.length) { // stops when reaching amt of chips
+            clearInterval(chipInterval);
+        }
+    }, 150) // stagger time placing chips
+
+}
+
+function awardChips(win) {
+    if(win) {
+        chips += Number(betMenu.value);
+    } else {
+        chips -= Number(betMenu.value);
+    }
+    chipsDisplay.innerHTML = "Chips: $" + chips;
 }
 
 function deal() {
@@ -101,7 +132,7 @@ function deal() {
     dealerCardsDiv.innerHTML = "";
     playerScoreDiv.innerHTML = 'Player Score: 0';
     dealerScoreDiv.innerHTML = 'Dealer Score: 0';
-    promptH2.innerHTML = "";
+    promptH3.innerHTML = "";
     playerHand = [];
     dealerHand = [];
     playerAceScore = 0;
@@ -168,17 +199,17 @@ function deal() {
             setTimeout(() => {             
                 // if anyone has BLACKJACK, the game is over
                 if(playerScore == 21 && dealerScore == 21) { // first check if BOTH have BLACKJACK
-                    promptH2.innerHTML = "BOTH have BLACKJACK! It's a PUSH!";
+                    promptH3.innerHTML = "BOTH have BLACKJACK! It's a PUSH!";
                     holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
                     declareWinner()
 
                 } else if(playerScore == 21) { // if player has blackjack (21)
-                    promptH2.innerHTML = "BLACKJACK!";
+                    promptH3.innerHTML = "BLACKJACK!";
                     holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
                     declareWinner()
 
                 } else if(dealerScore == 21) { // if dealer has blackjack (21)
-                    promptH2.innerHTML = "Dealer has BLACKJACK! You LOSE!";
+                    promptH3.innerHTML = "Dealer has BLACKJACK! You LOSE!";
                     holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
                     declareWinner()
                     
@@ -190,7 +221,7 @@ function deal() {
                     hitBtn.classList.add('enabled-btn');
                     standBtn.classList.add('enabled-btn');
 
-                    promptH2.innerHTML = "Hit or Stand..?";
+                    promptH3.innerHTML = "Hit or Stand..?";
                 }
             }, 800);
 
@@ -237,22 +268,22 @@ function hit() {
                 }, 700)
                 
             } else {
-                setTimeout(() => {
-                    promptH2.textContent = "BUSTED!";
+                // setTimeout(() => { // disable setTimeout(), don't let user press additional buttons
+                    promptH3.textContent = "BUSTED!";
                     standBtn.disabled = true;
                     standBtn.classList.add('disabled-btn');
                     standBtn.classList.remove('enabled-btn');
                     declareWinner()
-                }, 700)                
+                // }, 700)                
             }
         } else if (playerScore == 21) { // exactly 21, go to dealer
             setTimeout(() => {
-                // promptH2.textContent = "You have 21! Dealer's turn!";
+                // promptH3.textContent = "You have 21! Dealer's turn!";
                 stand();
             }, 700)
             
         } else {
-            promptH2.textContent = "Hit or Stand..?";
+            promptH3.textContent = "Hit or Stand..?";
             hitBtn.disabled = false;
             hitBtn.classList.remove('disabled-btn');
             hitBtn.classList.add('enabled-btn');
@@ -273,27 +304,27 @@ function stand() {
     setTimeout(() => { // Dealer reveal card + show score
         holeCard = document.getElementById("dealer-cards-div").children[0];
         holeCard.src = `images/cards/${dealerHand[0].file}`;
-        promptH2.innerHTML = "Dealer has " + dealerScore;
+        promptH3.innerHTML = "Dealer has " + dealerScore;
         dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
     }, 1200)
 
     setTimeout(() => { // if dealer hits or not
         if(dealerScore < 17) {
-            // promptH2.innerHTML = "Dealer must hit on " + dealerScore;
+            // promptH3.innerHTML = "Dealer must hit on " + dealerScore;
             hitDealer();
         // add this for dealer to hit on Soft 17
         // } else if (dealerScore ==  17) { 
         //     if(dealerAceScore >= 11) {
         //         dealerAceScore -= 10;
         //         dealerScore -= 10;
-        //         promptH2.innerHTML = "Dealer must hit on Soft 17";
+        //         promptH3.innerHTML = "Dealer must hit on Soft 17";
         //         hitDealer();
         //     } else {
-        //         promptH2.innerHTML = "Dealer stands on Hard " + dealerScore;
+        //         promptH3.innerHTML = "Dealer stands on Hard " + dealerScore;
         //         declareWinner();
         //     }
         } else {
-            // promptH2.innerHTML = "Dealer stands on " + dealerScore;
+            // promptH3.innerHTML = "Dealer stands on " + dealerScore;
             declareWinner();
         }
     }, 1000)
@@ -323,7 +354,7 @@ function hitDealer() {
             }
             stand();
             // if (dealerScore < 17 ) { // add this if dealer hits on soft 17--> || (dealerScore == 17 && dealerAceScore >= 11)
-            //     // promptH2.innerHTML = "Dealer has" + dealerScore;
+            //     // promptH3.innerHTML = "Dealer has" + dealerScore;
             //     // dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
             //     hitDealer();
             // } else {
@@ -337,7 +368,7 @@ function hitDealer() {
                 dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
                 stand();
             } else {
-                promptH2.innerHTML = "Dealer has " + dealerScore;
+                promptH3.innerHTML = "Dealer has " + dealerScore;
                 dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
                 stand();
             }
@@ -348,15 +379,15 @@ function hitDealer() {
 function declareWinner() {
     setTimeout(() => {
         if(playerScore > 21) {
-            promptH2.innerHTML = "You lose!";
+            promptH3.innerHTML = "You lose!";
         } else if(dealerScore > 21) {
-            promptH2.innerHTML = "You win! Congrats!"
+            promptH3.innerHTML = "You win! Congrats!"
         } else if(playerScore > dealerScore) {
-            promptH2.innerHTML = "You win! Congrats!";
+            promptH3.innerHTML = "You win! Congrats!";
         } else if (playerScore < dealerScore) {
-            promptH2.innerHTML = "Sorry! You lose!";
+            promptH3.innerHTML = "Sorry! You lose!";
         } else {
-            promptH2.innerHTML = "It's a Push!";
+            promptH3.innerHTML = "It's a Push!";
         }
         holeCard.src = `images/cards/${dealerHand[0].file}`;
         dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;

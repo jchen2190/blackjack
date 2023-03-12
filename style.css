@@ -17,7 +17,7 @@ body {
 .container {
     width: 100%;
     margin: 0 auto;
-    padding-top: 90px;
+    /* padding-top: 90px; */
     color: #FFF;
     height:100vh;
 }
@@ -56,10 +56,16 @@ body {
 }
 
 h1 {
-    padding-top: 40px;
+    padding: 40px;
+    margin: 0;
 }
 
 h2 {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+#prompt {
     height: 40px;
 }
 
