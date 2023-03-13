@@ -78,9 +78,7 @@ chipsDisplay.innerHTML = "Chips: $" + chips;
 
 
 function bet() {
-    chips += chipsBet;
-    chipsDisplay.innerHTML = "Chips Left: $" + chips; 
-    awardChips(false); // reset chips if no award is made (changing bet)
+    chipsDisplay.innerHTML = "Chips: $" + chips; 
     chipsBet = Number(betMenu.value);
     chipsBetDiv.innerHTML = ""; // reset chip images
 
@@ -108,16 +106,6 @@ function bet() {
             clearInterval(chipInterval);
         }
     }, 150) // stagger time placing chips
-
-}
-
-function awardChips(win) {
-    if(win) {
-        chips += Number(betMenu.value);
-    } else {
-        chips -= Number(betMenu.value);
-    }
-    chipsDisplay.innerHTML = "Chips: $" + chips;
 }
 
 function deal() {
@@ -182,7 +170,6 @@ function deal() {
                 }
             }
             dealerScore += card.valu;
-
             // Test Blackjack
             // dealerScore = 21;
             // playerScore = 21;
@@ -191,7 +178,6 @@ function deal() {
         if(dealCounter == 4) { // when finish dealing
             dealerScoreDiv.innerHTML = "Dealer Shows: " + dealerHand[1].valu;
             playerScoreDiv.innerHTML = "Player Score: " + playerScore;
-
             // save the first dealer card -- the hidden "hole card" to a variable
             // .children[0] returns the first child element inside the parent element
             holeCard = document.getElementById("dealer-cards-div").children[0];
@@ -204,15 +190,21 @@ function deal() {
                     declareWinner()
 
                 } else if(playerScore == 21) { // if player has blackjack (21)
-                    promptH3.innerHTML = "BLACKJACK!";
+                    promptH3.innerHTML = "BLACKJACK! 1:1.5 PAYOUT";
                     holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
-                    declareWinner()
+                    chips += Number(betMenu.value) * 1.5; // 2:3 payout
+                    holeCard.src = `images/cards/${dealerHand[0].file}`;
+                    dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
+                    dealBtn.disabled = false;
+                    dealBtn.classList.remove('disabled-btn');
+                    dealBtn.classList.add('enabled-btn');
+                    chipsDisplay.innerHTML = "Chips: $" + chips;
 
                 } else if(dealerScore == 21) { // if dealer has blackjack (21)
                     promptH3.innerHTML = "Dealer has BLACKJACK! You LOSE!";
                     holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
-                    declareWinner()
-                    
+                    declareWinner()     
+
                 } else { // no one has blackjack                 
                     hitBtn.classList.remove('disabled-btn');
                     standBtn.classList.remove('disabled-btn');
@@ -220,18 +212,15 @@ function deal() {
                     standBtn.disabled = false;
                     hitBtn.classList.add('enabled-btn');
                     standBtn.classList.add('enabled-btn');
-
                     promptH3.innerHTML = "Hit or Stand..?";
                 }
             }, 800);
-
         } // dealCounter == 4
-
     }, 800); // deal interval
 }
 
 function hit() {
-    hitBtn.disabled = true; // prevent multiple clicking at once if already busted
+    hitBtn.disabled = true; // prevent multiple clicking at once if already busted (prevent bug)
     hitBtn.classList.add('disabled-btn');
     hitBtn.classList.remove('enabled-btn');
 
@@ -278,7 +267,10 @@ function hit() {
             }
         } else if (playerScore == 21) { // exactly 21, go to dealer
             setTimeout(() => {
-                // promptH3.textContent = "You have 21! Dealer's turn!";
+                // prevent double clicking
+                standBtn.classList.remove('enabled-btn');
+                standBtn.classList.add('disabled-btn');
+                standBtn.disabled = true;
                 stand();
             }, 700)
             
@@ -302,7 +294,7 @@ function stand() {
     standBtn.disabled = true;
 
     setTimeout(() => { // Dealer reveal card + show score
-        holeCard = document.getElementById("dealer-cards-div").children[0];
+        // holeCard = document.getElementById("dealer-cards-div").children[0];
         holeCard.src = `images/cards/${dealerHand[0].file}`;
         promptH3.innerHTML = "Dealer has " + dealerScore;
         dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
@@ -327,7 +319,7 @@ function stand() {
             // promptH3.innerHTML = "Dealer stands on " + dealerScore;
             declareWinner();
         }
-    }, 1000)
+    }, 1100)
 }
 
 function hitDealer() {
@@ -340,13 +332,13 @@ function hitDealer() {
         
         if(card.kind == "Ace") { 
             if(dealerScore > 21 && dealerAceScore >= 11) {  // if dealer already has an Ace
-                dealerAceScore = 12;
+                dealerAceScore++;
                 card.valu = 1; // additional Ace counts as 1 = 12
             } else {
-                dealerAceScore = 11; // ace counts 11
+                dealerAceScore += 11; // ace counts 11, card.valu already at 11
             }
-
             dealerScore += card.valu;
+
             if(dealerScore > 21 && dealerAceScore > 10) { // if dealer has Ace that will bust him
                 dealerAceScore -= 10;
                 dealerScore -= 10;
@@ -380,12 +372,16 @@ function declareWinner() {
     setTimeout(() => {
         if(playerScore > 21) {
             promptH3.innerHTML = "You lose!";
+            awardChips(false)
         } else if(dealerScore > 21) {
             promptH3.innerHTML = "You win! Congrats!"
+            awardChips(true)
         } else if(playerScore > dealerScore) {
             promptH3.innerHTML = "You win! Congrats!";
+            awardChips(true)
         } else if (playerScore < dealerScore) {
             promptH3.innerHTML = "Sorry! You lose!";
+            awardChips(false)
         } else {
             promptH3.innerHTML = "It's a Push!";
         }
@@ -396,4 +392,13 @@ function declareWinner() {
         dealBtn.classList.add('enabled-btn');
     }, 1000)
        
+}
+
+function awardChips(win) {
+    if(win) {
+        chips += Number(betMenu.value);
+    } else {
+        chips -= Number(betMenu.value);
+    }
+    chipsDisplay.innerHTML = "Chips: $" + chips;
 }
