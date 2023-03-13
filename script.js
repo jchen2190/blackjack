@@ -100,7 +100,7 @@ function bet() {
         chipImg.style.width = "100px";
         chipImg.style.height = "100px";
         chipsBetDiv.appendChild(chipImg);
-        leftPos += 40; // move next chip to the right
+        leftPos += 60; // move next chip to the right
         chipIndx++;
         if(chipIndx == chipsArray.length) { // stops when reaching amt of chips
             clearInterval(chipInterval);
@@ -216,7 +216,7 @@ function deal() {
                 }
             }, 800);
         } // dealCounter == 4
-    }, 800); // deal interval
+    }, 500); // deal interval
 }
 
 function hit() {
