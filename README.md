@@ -12,4 +12,4 @@ This project was created using javascript.
 
 ## Deployment
 
-Go to [https://jchen2190@github.io/blackjack](https://jchen2190@github.io/blackjack)
+Go to [https://jchen2190.github.io/blackjack/](https://jchen2190.github.io/blackjack/)
