@@ -2,11 +2,8 @@ const kinds = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace'];
 const suits = ['Diamonds', 'Hearts', 'Spades', 'Clubs'];
 const deck = [];
 
-// make cards in a deck
 kinds.forEach(kind => {
     suits.forEach(suit => {
-        // let kind = kinds[k];
-        // let suit = suits[s];
         let name = `${kind} of ${suit}`;
         let file = `${kind}-of-${suit}.png`;
         let valu = 0;
@@ -14,35 +11,24 @@ kinds.forEach(kind => {
         if(kind.length == 3) {
             valu = 11; // Ace
         } else if(kind.length >= 4) {
-            valu = 10; // face card
+            valu = 10; // J Q K
         } else {
             valu = kind;
         }
-        const card = {name:name, file:file, kind:kind, suit:suit, valu:valu}; // assign all values to "card"
+        const card = {name:name, file:file, kind:kind, suit:suit, valu:valu};
         deck.push(card);
     });
 });
 
-// Shoe consisting of 6 decks of cards
 const shoe = [...deck, ...deck, ...deck, ...deck, ...deck, ...deck];
 
-shoe.sort(() => Math.random() - 0.5);
-
 // Fisher-Yates Shuffle 
-for(let i = 0; i < shoe.length; i++) {
-    let temp = shoe[i];
-    let r = Math.floor(Math.random() * shoe.length);
-    shoe[i] = shoe[r];
-    shoe[r] = temp;
-}
-// Fisher-Yates Shuffle using forEach
 shoe.forEach((e,i,a) => {
     let r = Math.floor(Math.random() * a.length);
     a[i] = a[r];
     a[r] = e;
 });
 
-// buttons
 const dealBtn = document.getElementById('deal-btn');
 dealBtn.addEventListener('click', deal);
 const hitBtn = document.getElementById('hit-btn');
@@ -57,17 +43,15 @@ const playerScoreDiv = document.getElementById('player-score-div');
 const dealerScoreDiv = document.getElementById('dealer-score-div');
 
 let dealCounter = 0;
-let playerHand = []; // hold cards
+let playerHand = [];
 let dealerHand = [];
 let playerScore = 0;
 let dealerScore = 0;
-// keep track of player and dealer Ace scores
 let playerAceScore = 0;
 let dealerAceScore = 0;
 let holeCard;
 let chipsBet = 0;
 
-// chips + bet
 const betMenu = document.getElementById('bet-menu');
 betMenu.addEventListener("change", bet);
 const chipsBetDiv = document.getElementById('chips-bet-div');
@@ -76,43 +60,37 @@ const chipsDisplay = document.getElementById('chips-display');
 let chips = 1000;
 chipsDisplay.innerHTML = "Chips: $" + chips;
 
-
 function bet() {
     chipsDisplay.innerHTML = "Chips: $" + chips; 
     chipsBet = Number(betMenu.value);
-    chipsBetDiv.innerHTML = ""; // reset chip images
-
-    // get data to display each chip
-    let indx = betMenu.selectedIndex; // Bet $150 = 11 index
-    let optn = betMenu.options[indx]; // ($150)
-    let chipsData = optn.dataset.chips; // "100&50";
-    let chipsArray = chipsData.split('&'); // ["100", "50"];
+    chipsBetDiv.innerHTML = "";
+    let indx = betMenu.selectedIndex;
+    let optn = betMenu.options[indx];
+    let chipsData = optn.dataset.chips;
+    let chipsArray = chipsData.split('&');
     let chipIndx = 0;
     let leftPos = 0;
 
     chipInterval = setInterval(() => {
-        let chip = chipsArray[chipIndx]; // 100  then  50
+        let chip = chipsArray[chipIndx];
         let chipImg = new Image();
         chipImg.src = `images/chips/chip-${chip}.png`
-        chipImg.style.zIndex = chipIndx + ""; // pile chip onto another (stack);
+        chipImg.style.zIndex = chipIndx + "";
         chipImg.style.position = "absolute";
         chipImg.style.left = (leftPos) + "px";
         chipImg.style.width = "100px";
         chipImg.style.height = "100px";
         chipsBetDiv.appendChild(chipImg);
-        leftPos += 60; // move next chip to the right
+        leftPos += 60;
         chipIndx++;
-        if(chipIndx == chipsArray.length) { // stops when reaching amt of chips
+        if(chipIndx == chipsArray.length) {
             clearInterval(chipInterval);
         }
-    }, 150) // stagger time placing chips
+    }, 150)
 }
 
 function deal() {
-    // reset
-    dealBtn.disabled = true;
-    dealBtn.classList.remove('enabled-btn');
-    dealBtn.classList.add('disabled-btn');   
+    dealBtnDisable();
     dealCounter = 0;
     playerScore = 0;
     dealerScore = 0;
@@ -128,33 +106,31 @@ function deal() {
     
     let dealInterval = setInterval(() => {
         dealCounter++;
-        let pic = new Image(); // instantiate image to each new card
-        let card = shoe.pop(); // card popped is saved to new card
+        let pic = new Image();
+        let card = shoe.pop();
 
         if(dealCounter == 4) {
-            clearInterval(dealInterval); // stop dealing after 4 cards
+            clearInterval(dealInterval);
         }
-        if(dealCounter != 2) { // If not 2nd card
+        if(dealCounter != 2) {
             pic.src = `images/cards/${card.file}`;
         } else {
-            pic.src = `images/cards/0-Back-of-Card-Red.png`; // face down card
+            pic.src = `images/cards/0-Back-of-Card-Red.png`;
         }
 
-       // the 1st or 3rd card, which goes to the player
-       if(dealCounter % 2 == 1) {
+       if(dealCounter % 2 == 1) { // player card
             playerCardsDiv.appendChild(pic);
             playerHand.push(card);
             if(card.kind == "Ace") {
                 if(playerAceScore == 11) { 
                     playerAceScore = 12; 
-                    card.valu = 1; // increment player score by 1
+                    card.valu = 1;
                 } else {
-                    playerAceScore = 11; // first ace counts 11
+                    playerAceScore = 11;
                 }
             }
             playerScore += card.valu;
-        } else {
-            // make cards appear farther away
+        } else { // dealer card
             pic.style.width = "105px";
             pic.style.height = "auto";
         
@@ -162,68 +138,53 @@ function deal() {
             dealerHand.push(card);
 
             if(card.kind == "Ace") {
-                if(dealerAceScore == 11) {  // if dealer already has an Ace
+                if(dealerAceScore == 11) {
                     dealerAceScore = 12;
-                    card.valu = 1; // second Ace counts as 1 = 12
+                    card.valu = 1;
                 } else {
-                    dealerAceScore = 11; // first ace counts 11
+                    dealerAceScore = 11;
                 }
             }
             dealerScore += card.valu;
-            // Test Blackjack
-            // dealerScore = 21;
-            // playerScore = 21;
         }
 
-        if(dealCounter == 4) { // when finish dealing
+        if(dealCounter == 4) {
             dealerScoreDiv.innerHTML = "Dealer Shows: " + dealerHand[1].valu;
             playerScoreDiv.innerHTML = "Player Score: " + playerScore;
-            // save the first dealer card -- the hidden "hole card" to a variable
-            // .children[0] returns the first child element inside the parent element
             holeCard = document.getElementById("dealer-cards-div").children[0];
            
             setTimeout(() => {             
-                // if anyone has BLACKJACK, the game is over
-                if(playerScore == 21 && dealerScore == 21) { // first check if BOTH have BLACKJACK
+                if(playerScore == 21 && dealerScore == 21) {
                     promptH3.innerHTML = "BOTH have BLACKJACK! It's a PUSH!";
-                    holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
+                    holeCard.src = `images/cards/${dealerHand[0].file}`; card
                     declareWinner()
 
-                } else if(playerScore == 21) { // if player has blackjack (21)
+                } else if(playerScore == 21) {
                     promptH3.innerHTML = "BLACKJACK! 1:1.5 PAYOUT";
-                    holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
-                    chips += Number(betMenu.value) * 1.5; // 2:3 payout
+                    holeCard.src = `images/cards/${dealerHand[0].file}`;
+                    chips += Number(betMenu.value) * 1.5;
                     holeCard.src = `images/cards/${dealerHand[0].file}`;
                     dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
-                    dealBtn.disabled = false;
-                    dealBtn.classList.remove('disabled-btn');
-                    dealBtn.classList.add('enabled-btn');
+                    dealBtnEnable();
                     chipsDisplay.innerHTML = "Chips: $" + chips;
 
-                } else if(dealerScore == 21) { // if dealer has blackjack (21)
+                } else if(dealerScore == 21) {
                     promptH3.innerHTML = "Dealer has BLACKJACK! You LOSE!";
-                    holeCard.src = `images/cards/${dealerHand[0].file}`; // reveal dealer card
+                    holeCard.src = `images/cards/${dealerHand[0].file}`;
                     declareWinner()     
 
-                } else { // no one has blackjack                 
-                    hitBtn.classList.remove('disabled-btn');
-                    standBtn.classList.remove('disabled-btn');
-                    hitBtn.disabled = false;
-                    standBtn.disabled = false;
-                    hitBtn.classList.add('enabled-btn');
-                    standBtn.classList.add('enabled-btn');
+                } else {
+                    hitBtnEnable();
+                    standBtnEnable();
                     promptH3.innerHTML = "Hit or Stand..?";
                 }
             }, 800);
-        } // dealCounter == 4
-    }, 500); // deal interval
+        }
+    }, 500);
 }
 
 function hit() {
-    hitBtn.disabled = true; // prevent multiple clicking at once if already busted (prevent bug)
-    hitBtn.classList.add('disabled-btn');
-    hitBtn.classList.remove('enabled-btn');
-
+    hitBtnDisable();
     const card = shoe.pop();
     const pic = new Image();
     pic.src = `images/cards/${card.file}`;
@@ -231,92 +192,56 @@ function hit() {
     playerHand.push(card);
 
     if(card.kind == "Ace") {
-        if(playerScore < 11) { // if cards less than 11, add "Ace" value
+        if(playerScore < 11) {
             playerScore += 11;
             playerAceScore = 11;
         } else {
             playerScore++;
             playerAceScore++;
         }
-        hitBtn.disabled = false;
-        hitBtn.classList.remove('disabled-btn');
-        hitBtn.classList.add('enabled-btn');
+        hitBtnEnable();
     } else {
         playerScore += card.valu;
         playerScoreDiv.innerHTML = "Player Score: " + playerScore;
 
         if(playerScore > 21) {
-            if (playerAceScore >= 11) { // if player has Ace, reduce score to prevent bust
+            if (playerAceScore >= 11) {
                 setTimeout(() => {
                     playerAceScore -= 10;
                     playerScore -= 10;
                     playerScoreDiv.innerHTML = "Player Score: " + playerScore;
-                    hitBtn.disabled = false;
-                    hitBtn.classList.remove('disabled-btn');
-                    hitBtn.classList.add('enabled-btn');
+                    hitBtnEnable();
                 }, 700)
-                
             } else {
-                // setTimeout(() => { // disable setTimeout(), don't let user press additional buttons
                     promptH3.textContent = "BUSTED!";
-                    standBtn.disabled = true;
-                    standBtn.classList.add('disabled-btn');
-                    standBtn.classList.remove('enabled-btn');
-                    declareWinner()
-                // }, 700)                
+                    standBtnDisable();
+                    declareWinner()             
             }
-        } else if (playerScore == 21) { // exactly 21, go to dealer
+        } else if (playerScore == 21) {
             setTimeout(() => {
-                // prevent double clicking
-                standBtn.classList.remove('enabled-btn');
-                standBtn.classList.add('disabled-btn');
-                standBtn.disabled = true;
+                standBtnDisable();
                 stand();
             }, 700)
-            
         } else {
             promptH3.textContent = "Hit or Stand..?";
-            hitBtn.disabled = false;
-            hitBtn.classList.remove('disabled-btn');
-            hitBtn.classList.add('enabled-btn');
+            hitBtnEnable();
         }
     }
-    playerScoreDiv.innerHTML = "Player Score: " + playerScore; // update score
+    playerScoreDiv.innerHTML = "Player Score: " + playerScore;
 }
 
 function stand() {
-    // disable buttons when player stands
-    hitBtn.classList.remove('enabled-btn');
-    standBtn.classList.remove('enabled-btn');
-    hitBtn.classList.add('disabled-btn');
-    standBtn.classList.add('disabled-btn');
-    hitBtn.disabled = true;
-    standBtn.disabled = true;
-
-    setTimeout(() => { // Dealer reveal card + show score
-        // holeCard = document.getElementById("dealer-cards-div").children[0];
+    hitBtnDisable();
+    standBtnDisable();
+    setTimeout(() => {
         holeCard.src = `images/cards/${dealerHand[0].file}`;
         promptH3.innerHTML = "Dealer has " + dealerScore;
         dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
     }, 1200)
-
-    setTimeout(() => { // if dealer hits or not
+    setTimeout(() => {
         if(dealerScore < 17) {
-            // promptH3.innerHTML = "Dealer must hit on " + dealerScore;
             hitDealer();
-        // add this for dealer to hit on Soft 17
-        // } else if (dealerScore ==  17) { 
-        //     if(dealerAceScore >= 11) {
-        //         dealerAceScore -= 10;
-        //         dealerScore -= 10;
-        //         promptH3.innerHTML = "Dealer must hit on Soft 17";
-        //         hitDealer();
-        //     } else {
-        //         promptH3.innerHTML = "Dealer stands on Hard " + dealerScore;
-        //         declareWinner();
-        //     }
         } else {
-            // promptH3.innerHTML = "Dealer stands on " + dealerScore;
             declareWinner();
         }
     }, 1100)
@@ -331,30 +256,23 @@ function hitDealer() {
         dealerHand.push(card);
         
         if(card.kind == "Ace") { 
-            if(dealerScore > 21 && dealerAceScore >= 11) {  // if dealer already has an Ace
+            if(dealerScore > 21 && dealerAceScore >= 11) {
                 dealerAceScore++;
-                card.valu = 1; // additional Ace counts as 1 = 12
+                card.valu = 1;
             } else {
-                dealerAceScore += 11; // ace counts 11, card.valu already at 11
+                dealerAceScore += 11;
             }
             dealerScore += card.valu;
 
-            if(dealerScore > 21 && dealerAceScore > 10) { // if dealer has Ace that will bust him
+            if(dealerScore > 21 && dealerAceScore > 10) {
                 dealerAceScore -= 10;
                 dealerScore -= 10;
                 dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
             }
             stand();
-            // if (dealerScore < 17 ) { // add this if dealer hits on soft 17--> || (dealerScore == 17 && dealerAceScore >= 11)
-            //     // promptH3.innerHTML = "Dealer has" + dealerScore;
-            //     // dealerScoreDiv.innerHTML = "Dealer Score:" + dealerScore;
-            //     hitDealer();
-            // } else {
-            //     stand();
-            // }
-        } else { // card that is not an Ace
+        } else {
             dealerScore += card.valu;
-            if(dealerScore > 21 && dealerAceScore > 10) { // if dealer has previous Ace is hand
+            if(dealerScore > 21 && dealerAceScore > 10) {
                 dealerAceScore -= 10;
                 dealerScore -= 10;
                 dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
@@ -387,11 +305,8 @@ function declareWinner() {
         }
         holeCard.src = `images/cards/${dealerHand[0].file}`;
         dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
-        dealBtn.disabled = false;
-        dealBtn.classList.remove('disabled-btn');
-        dealBtn.classList.add('enabled-btn');
+        dealBtnEnable();
     }, 1000)
-       
 }
 
 function awardChips(win) {
@@ -401,4 +316,42 @@ function awardChips(win) {
         chips -= Number(betMenu.value);
     }
     chipsDisplay.innerHTML = "Chips: $" + chips;
+}
+
+function dealBtnEnable() {
+    dealBtn.disabled = false;
+    dealBtn.classList.remove('disabled-btn');
+    dealBtn.classList.add('enabled-btn');
+    betMenu.disabled = false;
+}
+
+function dealBtnDisable() {
+    dealBtn.disabled = true;
+    dealBtn.classList.remove('enabled-btn');
+    dealBtn.classList.add('disabled-btn');
+    betMenu.disabled = true;
+}
+
+function hitBtnEnable() {
+    hitBtn.disabled = false;
+    hitBtn.classList.remove('disabled-btn');
+    hitBtn.classList.add('enabled-btn');
+}
+
+function hitBtnDisable() {
+    hitBtn.classList.remove('enabled-btn');
+    hitBtn.classList.add('disabled-btn');
+    hitBtn.disabled = true;
+}
+
+function standBtnEnable() {
+    standBtn.classList.remove('disabled-btn');
+    standBtn.classList.add('enabled-btn');
+    standBtn.disabled = false;
+}
+
+function standBtnDisable() {
+    standBtn.classList.remove('enabled-btn');
+    standBtn.classList.add('disabled-btn');
+    standBtn.disabled = true;
 }

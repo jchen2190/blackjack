@@ -12,44 +12,39 @@ body {
     padding: 0;
     overflow: hidden;
 }
-
 .container {
     width: 100%;
     margin: 0 auto;
-    /* padding-top: 90px; */
     color: #FFF;
     height:100vh;
 }
-
 .score-board {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     margin: 20px;
 }
-
 #dealer-cards-div , #player-cards-div {
     margin-bottom: 80px;
     height: 100px;
-    /* background-color: #00ffff50; */
-    /* border: 7px dashed yellow; */
     padding: 0;
 }
-
 h1 {
     padding: 40px;
     margin: 0;
 }
-
 h2 {
     font-size: 1.2rem;
     margin: 0;
 }
-
 #prompt {
     height: 40px;
 }
-
+select {
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 1.2rem;
+}
 button {
     width: 100px;
     cursor: pointer;
@@ -59,28 +54,23 @@ button {
     border-radius: 5px;
     padding: 7px;
 }
-
 button:hover {
     background-color: #494;
 }
-
 .disabled-btn {
     background-color: #464;
     opacity: 0.7;
     cursor: default;
 }
-
 .enabled-btn {
     background-color: #494;
     color: white;
     opacity: 1;
     cursor: pointer;
 }
-
 .disabled-btn:hover {
     background-color: #464;
 }
-
 img {
     width: 115px;
     height: auto;
