@@ -60,6 +60,10 @@ const chipsDisplay = document.getElementById('chips-display');
 let chips = 1000;
 chipsDisplay.innerHTML = "Chips: $" + chips;
 
+let chipAudio = new Audio("./audio/pokerchip.wav");
+let cardDealAudio = new Audio("./audio/card-deal");
+let cardFlipAudio = new Audio("./audio/card-flip.wav");
+
 function bet() {
     chipsDisplay.innerHTML = "Chips: $" + chips; 
     chipsBet = Number(betMenu.value);
@@ -71,6 +75,7 @@ function bet() {
     let chipIndx = 0;
     let leftPos = 0;
 
+    chipAudio.play();
     chipInterval = setInterval(() => {
         let chip = chipsArray[chipIndx];
         let chipImg = new Image();
@@ -251,6 +256,8 @@ function hitDealer() {
     setTimeout(() => {
         let card = shoe.pop();
         let pic = new Image();
+        pic.style.width = "105px";
+        pic.style.height = "auto";
         pic.src = `images/cards/${card.file}`
         dealerCardsDiv.appendChild(pic);
         dealerHand.push(card);
