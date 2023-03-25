@@ -14,20 +14,22 @@
         <h1>Blackjack</h1>
         <h2>dealer must draw to 16 and stand on all 17's</h2>
         <div class="score-board">
-            <span id="dealer-score-div">Dealer</span>
             <div id="dealer-cards-div"></div>
+            <span id="dealer-score-div">0</span>
+            <p>Dealer</p>
         </div>
         <div class="score-board">
-            <span id="player-score-div">Player</span>
             <div id="player-cards-div"></div>
+            <span id="player-score-div">0</span>
+            <p>Player</p>
         </div>
-        <div id="chips-display"></div>
-
+        <div id="chips-bet-div"></div>
+        <div id="chips-won-div"></div>
         <h3 id="prompt"></h3>  
-
+        <div id="chips-display"></div>
+        
         <div>
             <span id="bet-txt">BET</span>
-            
             <select id="bet-menu">
                 <option value="0">Bet</option>
                 <option value="15" data-chips="10&5">$15</option>
@@ -58,12 +60,7 @@
             <button id="deal-btn" class="enabled-btn">DEAL</button>
             <button id="hit-btn" class="disabled-btn" disabled>HIT</button>
             <button id="stand-btn" class="disabled-btn" disabled>STAND</button>
-        </div>
-
-        <div id="chips-bet-div"></div>
-        <div id="chips-won-div"></div>
-    </div>
-
-    
+        </div>   
+    </div>  
 </body>
 </html>

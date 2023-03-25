@@ -34,7 +34,7 @@ dealBtn.addEventListener('click', deal);
 const hitBtn = document.getElementById('hit-btn');
 hitBtn.addEventListener('click', hit);
 const standBtn = document.getElementById('stand-btn');
-standBtn.addEventListener('click', stand);
+standBtn.addEventListener('click', beforeStand);
 
 const promptH3 = document.getElementById('prompt');
 const playerCardsDiv = document.getElementById('player-cards-div');
@@ -57,7 +57,7 @@ betMenu.addEventListener("change", bet);
 const chipsBetDiv = document.getElementById('chips-bet-div');
 const chipsWonDiv = document.getElementById('chips-won-div');
 const chipsDisplay = document.getElementById('chips-display');
-let chips = 1000;
+let chips = 10000;
 chipsDisplay.innerHTML = "Chips: $" + chips;
 
 let chipAudio = new Audio("./audio/pokerchip.wav");
@@ -83,8 +83,8 @@ function bet() {
         chipImg.style.zIndex = chipIndx + "";
         chipImg.style.position = "absolute";
         chipImg.style.left = (leftPos) + "px";
-        chipImg.style.width = "100px";
-        chipImg.style.height = "100px";
+        chipImg.style.width = "80px";
+        chipImg.style.height = "80px";
         chipsBetDiv.appendChild(chipImg);
         leftPos += 60;
         chipIndx++;
@@ -101,8 +101,8 @@ function deal() {
     dealerScore = 0;
     playerCardsDiv.innerHTML = "";
     dealerCardsDiv.innerHTML = "";
-    playerScoreDiv.innerHTML = 'Player Score: 0';
-    dealerScoreDiv.innerHTML = 'Dealer Score: 0';
+    playerScoreDiv.innerHTML = '0';
+    dealerScoreDiv.innerHTML = '0';
     promptH3.innerHTML = "";
     playerHand = [];
     dealerHand = [];
@@ -154,8 +154,8 @@ function deal() {
         }
 
         if(dealCounter == 4) {
-            dealerScoreDiv.innerHTML = "Dealer Shows: " + dealerHand[1].valu;
-            playerScoreDiv.innerHTML = "Player Score: " + playerScore;
+            dealerScoreDiv.innerHTML = dealerHand[1].valu;
+            playerScoreDiv.innerHTML = playerScore;
             holeCard = document.getElementById("dealer-cards-div").children[0];
            
             setTimeout(() => {             
@@ -169,7 +169,7 @@ function deal() {
                     holeCard.src = `images/cards/${dealerHand[0].file}`;
                     chips += Number(betMenu.value) * 1.5;
                     holeCard.src = `images/cards/${dealerHand[0].file}`;
-                    dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
+                    dealerScoreDiv.innerHTML = dealerScore;
                     dealBtnEnable();
                     chipsDisplay.innerHTML = "Chips: $" + chips;
 
@@ -207,14 +207,14 @@ function hit() {
         hitBtnEnable();
     } else {
         playerScore += card.valu;
-        playerScoreDiv.innerHTML = "Player Score: " + playerScore;
+        playerScoreDiv.innerHTML = playerScore;
 
         if(playerScore > 21) {
             if (playerAceScore >= 11) {
                 setTimeout(() => {
                     playerAceScore -= 10;
                     playerScore -= 10;
-                    playerScoreDiv.innerHTML = "Player Score: " + playerScore;
+                    playerScoreDiv.innerHTML = playerScore;
                     hitBtnEnable();
                 }, 700)
             } else {
@@ -225,31 +225,37 @@ function hit() {
         } else if (playerScore == 21) {
             setTimeout(() => {
                 standBtnDisable();
-                stand();
+                beforeStand();
             }, 700)
         } else {
             promptH3.textContent = "Hit or Stand..?";
             hitBtnEnable();
         }
     }
-    playerScoreDiv.innerHTML = "Player Score: " + playerScore;
+    playerScoreDiv.innerHTML = playerScore;
 }
 
-function stand() {
+function beforeStand() {
     hitBtnDisable();
     standBtnDisable();
     setTimeout(() => {
         holeCard.src = `images/cards/${dealerHand[0].file}`;
         promptH3.innerHTML = "Dealer has " + dealerScore;
-        dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
-    }, 1200)
+        dealerScoreDiv.innerHTML = dealerScore;
+    }, 1000)
+    setTimeout(() => {
+        stand();
+    }, 1000)
+}
+
+function stand() {
     setTimeout(() => {
         if(dealerScore < 17) {
             hitDealer();
         } else {
             declareWinner();
         }
-    }, 1100)
+    }, 700)
 }
 
 function hitDealer() {
@@ -274,7 +280,7 @@ function hitDealer() {
             if(dealerScore > 21 && dealerAceScore > 10) {
                 dealerAceScore -= 10;
                 dealerScore -= 10;
-                dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
+                dealerScoreDiv.innerHTML = dealerScore;
             }
             stand();
         } else {
@@ -282,15 +288,15 @@ function hitDealer() {
             if(dealerScore > 21 && dealerAceScore > 10) {
                 dealerAceScore -= 10;
                 dealerScore -= 10;
-                dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
+                dealerScoreDiv.innerHTML = dealerScore;
                 stand();
             } else {
                 promptH3.innerHTML = "Dealer has " + dealerScore;
-                dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
+                dealerScoreDiv.innerHTML = dealerScore;
                 stand();
             }
         }
-    }, 1000)
+    }, 700)
 }
 
 function declareWinner() {
@@ -311,7 +317,7 @@ function declareWinner() {
             promptH3.innerHTML = "It's a Push!";
         }
         holeCard.src = `images/cards/${dealerHand[0].file}`;
-        dealerScoreDiv.innerHTML = "Dealer Score: " + dealerScore;
+        dealerScoreDiv.innerHTML = dealerScore;
         dealBtnEnable();
     }, 1000)
 }
@@ -324,39 +330,33 @@ function awardChips(win) {
     }
     chipsDisplay.innerHTML = "Chips: $" + chips;
 }
-
 function dealBtnEnable() {
     dealBtn.disabled = false;
     dealBtn.classList.remove('disabled-btn');
     dealBtn.classList.add('enabled-btn');
     betMenu.disabled = false;
 }
-
 function dealBtnDisable() {
     dealBtn.disabled = true;
     dealBtn.classList.remove('enabled-btn');
     dealBtn.classList.add('disabled-btn');
     betMenu.disabled = true;
 }
-
 function hitBtnEnable() {
     hitBtn.disabled = false;
     hitBtn.classList.remove('disabled-btn');
     hitBtn.classList.add('enabled-btn');
 }
-
 function hitBtnDisable() {
     hitBtn.classList.remove('enabled-btn');
     hitBtn.classList.add('disabled-btn');
     hitBtn.disabled = true;
 }
-
 function standBtnEnable() {
     standBtn.classList.remove('disabled-btn');
     standBtn.classList.add('enabled-btn');
     standBtn.disabled = false;
 }
-
 function standBtnDisable() {
     standBtn.classList.remove('enabled-btn');
     standBtn.classList.add('disabled-btn');

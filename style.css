@@ -22,15 +22,27 @@ body {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    margin: 20px;
+    margin: 0 0 20px 0;
+}
+.score-board p {
+    margin: 10px;
 }
 #dealer-cards-div , #player-cards-div {
     margin-bottom: 80px;
     height: 100px;
     padding: 0;
 }
+#dealer-score-div, #player-score-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px;
+    height: 35px;
+    border: 2px white solid;
+    border-radius: 50%;
+}
 h1 {
-    padding: 40px;
+    padding: 20px;
     margin: 0;
 }
 h2 {
