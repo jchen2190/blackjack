@@ -35,6 +35,11 @@ const hitBtn = document.getElementById('hit-btn');
 hitBtn.addEventListener('click', hit);
 const standBtn = document.getElementById('stand-btn');
 standBtn.addEventListener('click', beforeStand);
+const dblBtn = document.getElementById('double-btn');
+dblBtn.addEventListener('click', () => {
+    dblDown = true;
+    doubleDown();
+});
 
 const promptH3 = document.getElementById('prompt');
 const playerCardsDiv = document.getElementById('player-cards-div');
@@ -51,13 +56,14 @@ let playerAceScore = 0;
 let dealerAceScore = 0;
 let holeCard;
 let chipsBet = 0;
+let dblDown = false;
 
 const betMenu = document.getElementById('bet-menu');
 betMenu.addEventListener("change", bet);
 const chipsBetDiv = document.getElementById('chips-bet-div');
 const chipsWonDiv = document.getElementById('chips-won-div');
 const chipsDisplay = document.getElementById('chips-display');
-let chips = 10000;
+let chips = 1000;
 chipsDisplay.innerHTML = "Chips: $" + chips;
 
 let chipAudio = new Audio("./audio/pokerchip.wav");
@@ -96,6 +102,7 @@ function bet() {
 
 function deal() {
     dealBtnDisable();
+    chipsBet = Number(betMenu.value);
     dealCounter = 0;
     playerScore = 0;
     dealerScore = 0;
@@ -161,8 +168,8 @@ function deal() {
             setTimeout(() => {             
                 if(playerScore == 21 && dealerScore == 21) {
                     promptH3.innerHTML = "BOTH have BLACKJACK! It's a PUSH!";
-                    holeCard.src = `images/cards/${dealerHand[0].file}`; card
-                    declareWinner()
+                    holeCard.src = `images/cards/${dealerHand[0].file}`;
+                    declareWinner();
 
                 } else if(playerScore == 21) {
                     promptH3.innerHTML = "BLACKJACK! 1:1.5 PAYOUT";
@@ -176,9 +183,10 @@ function deal() {
                 } else if(dealerScore == 21) {
                     promptH3.innerHTML = "Dealer has BLACKJACK! You LOSE!";
                     holeCard.src = `images/cards/${dealerHand[0].file}`;
-                    declareWinner()     
+                    declareWinner();  
 
                 } else {
+                    dblBtnEnable();
                     hitBtnEnable();
                     standBtnEnable();
                     promptH3.innerHTML = "Hit or Stand..?";
@@ -188,7 +196,55 @@ function deal() {
     }, 500);
 }
 
+function doubleDown() {
+    hitBtnDisable();
+    dblBtnDisable();
+    standBtnDisable();
+    chipAudio.play();
+    chipsBet *= 2;
+    const card = shoe.pop();
+    const pic = new Image();
+    pic.src = `images/cards/${card.file}`;
+    // pic.style.transform = "rotate(90deg)";
+    playerCardsDiv.appendChild(pic);
+    playerHand.push(card);
+    
+    if(card.kind == "Ace") {
+        if(playerScore < 11) {
+            playerScore += 11;
+            playerAceScore = 11;
+        } else {
+            playerScore++;
+            playerAceScore++;
+        }
+        beforeStand();
+    } else {
+        playerScore += card.valu;
+        playerScoreDiv.innerHTML = playerScore;
+
+        if(playerScore > 21) {
+            if (playerAceScore >= 11) {
+                setTimeout(() => {
+                    playerAceScore -= 10;
+                    playerScore -= 10;
+                    playerScoreDiv.innerHTML = playerScore;
+                    beforeStand();
+                }, 700)
+            } else {
+                    promptH3.textContent = "BUSTED!";
+                    declareWinner()             
+            }
+        } else {
+            setTimeout(() => {
+                beforeStand();
+            }, 700)
+        }
+    }
+    playerScoreDiv.innerHTML = playerScore;
+}
+
 function hit() {
+    dblBtnDisable();
     hitBtnDisable();
     const card = shoe.pop();
     const pic = new Image();
@@ -324,9 +380,9 @@ function declareWinner() {
 
 function awardChips(win) {
     if(win) {
-        chips += Number(betMenu.value);
+        chips += chipsBet;
     } else {
-        chips -= Number(betMenu.value);
+        chips -= chipsBet;
     }
     chipsDisplay.innerHTML = "Chips: $" + chips;
 }
@@ -348,17 +404,27 @@ function hitBtnEnable() {
     hitBtn.classList.add('enabled-btn');
 }
 function hitBtnDisable() {
+    hitBtn.disabled = true;
     hitBtn.classList.remove('enabled-btn');
     hitBtn.classList.add('disabled-btn');
-    hitBtn.disabled = true;
 }
 function standBtnEnable() {
+    standBtn.disabled = false;
     standBtn.classList.remove('disabled-btn');
     standBtn.classList.add('enabled-btn');
-    standBtn.disabled = false;
 }
 function standBtnDisable() {
+    standBtn.disabled = true;
     standBtn.classList.remove('enabled-btn');
     standBtn.classList.add('disabled-btn');
-    standBtn.disabled = true;
+}
+function dblBtnEnable() {
+    dblBtn.disabled = false;
+    dblBtn.classList.remove('disabled-btn');
+    dblBtn.classList.add('enabled-btn');
+}
+function dblBtnDisable() {
+    dblBtn.disabled = true;
+    dblBtn.classList.add('disabled-btn');
+    dblBtn.classList.remove('enabled-btn');
 }
