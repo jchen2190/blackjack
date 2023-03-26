@@ -136,7 +136,7 @@ function deal() {
             }
             playerScore += card.valu;
         } else { // dealer card
-            pic.style.width = "105px";
+            pic.style.width = "90px";
             pic.style.height = "auto";
         
             dealerCardsDiv.appendChild(pic);
