@@ -67,7 +67,7 @@ let chips = 1000;
 chipsDisplay.innerHTML = "Chips: $" + chips;
 
 let chipAudio = new Audio("./audio/pokerchip.wav");
-let cardDealAudio = new Audio("./audio/card-deal");
+let cardDealAudio = new Audio("./audio/card-deal.wav");
 let cardFlipAudio = new Audio("./audio/card-flip.wav");
 
 function bet() {
@@ -186,9 +186,11 @@ function deal() {
                     declareWinner();  
 
                 } else {
-                    dblBtnEnable();
-                    hitBtnEnable();
-                    standBtnEnable();
+                    btnEnable(dblBtn);
+                    btnEnable(hitBtn);
+                    btnEnable(standBtn);
+                    // hitBtnEnable();
+                    // standBtnEnable();
                     promptH3.innerHTML = "Hit or Stand..?";
                 }
             }, 800);
@@ -196,10 +198,12 @@ function deal() {
     }, 500);
 }
 
+// TODO: Split Function()
+
 function doubleDown() {
-    hitBtnDisable();
-    dblBtnDisable();
-    standBtnDisable();
+    btnDisable(hitBtn);
+    btnDisable(dblBtn);
+    btnDisable(standBtn);
     chipAudio.play();
     chipsBet *= 2;
     const card = shoe.pop();
@@ -244,8 +248,8 @@ function doubleDown() {
 }
 
 function hit() {
-    dblBtnDisable();
-    hitBtnDisable();
+    btnDisable(dblBtn);
+    btnDisable(hitBtn);
     const card = shoe.pop();
     const pic = new Image();
     pic.src = `images/cards/${card.file}`;
@@ -260,7 +264,7 @@ function hit() {
             playerScore++;
             playerAceScore++;
         }
-        hitBtnEnable();
+        btnEnable(hitBtn);
     } else {
         playerScore += card.valu;
         playerScoreDiv.innerHTML = playerScore;
@@ -271,29 +275,29 @@ function hit() {
                     playerAceScore -= 10;
                     playerScore -= 10;
                     playerScoreDiv.innerHTML = playerScore;
-                    hitBtnEnable();
+                    btnEnable(hitBtn);
                 }, 700)
             } else {
                     promptH3.textContent = "BUSTED!";
-                    standBtnDisable();
+                    btnDisable(standBtn);
                     declareWinner()             
             }
         } else if (playerScore == 21) {
             setTimeout(() => {
-                standBtnDisable();
+                btnDisable(standBtn);
                 beforeStand();
             }, 700)
         } else {
             promptH3.textContent = "Hit or Stand..?";
-            hitBtnEnable();
+            btnEnable(hitBtn);
         }
     }
     playerScoreDiv.innerHTML = playerScore;
 }
 
-function beforeStand() {
-    hitBtnDisable();
-    standBtnDisable();
+function beforeStand() { // smoother transition gameplay
+    btnDisable(hitBtn);
+    btnDisable(standBtn);
     setTimeout(() => {
         holeCard.src = `images/cards/${dealerHand[0].file}`;
         promptH3.innerHTML = "Dealer has " + dealerScore;
@@ -398,33 +402,13 @@ function dealBtnDisable() {
     dealBtn.classList.add('disabled-btn');
     betMenu.disabled = true;
 }
-function hitBtnEnable() {
-    hitBtn.disabled = false;
-    hitBtn.classList.remove('disabled-btn');
-    hitBtn.classList.add('enabled-btn');
+function btnEnable(btn) {
+    btn.disabled = false;
+    btn.classList.remove('disabled-btn');
+    btn.classList.add('enabled-btn');
 }
-function hitBtnDisable() {
-    hitBtn.disabled = true;
-    hitBtn.classList.remove('enabled-btn');
-    hitBtn.classList.add('disabled-btn');
-}
-function standBtnEnable() {
-    standBtn.disabled = false;
-    standBtn.classList.remove('disabled-btn');
-    standBtn.classList.add('enabled-btn');
-}
-function standBtnDisable() {
-    standBtn.disabled = true;
-    standBtn.classList.remove('enabled-btn');
-    standBtn.classList.add('disabled-btn');
-}
-function dblBtnEnable() {
-    dblBtn.disabled = false;
-    dblBtn.classList.remove('disabled-btn');
-    dblBtn.classList.add('enabled-btn');
-}
-function dblBtnDisable() {
-    dblBtn.disabled = true;
-    dblBtn.classList.add('disabled-btn');
-    dblBtn.classList.remove('enabled-btn');
+function btnDisable(btn) {
+    btn.disabled = true;
+    btn.classList.remove('enabled-btn');
+    btn.classList.add('disabled-btn');
 }

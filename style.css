@@ -20,12 +20,14 @@ body {
 }
 .score-board {
     display: flex;
-    justify-content: flex-start;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
     align-items: center;
     margin: 0 0 20px 0;
 }
 .score-board p {
-    margin: 10px;
+    width: 80px;
+    margin-right: 10px;
 }
 #dealer-cards-div , #player-cards-div {
     margin-bottom: 80px;
@@ -38,6 +40,7 @@ body {
     align-items: center;
     width: 35px;
     height: 35px;
+    margin: 20px;
     border: 2px white solid;
     border-radius: 50%;
 }
